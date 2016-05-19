@@ -12,7 +12,7 @@ optional
 * can import from platforms other than google
 
 #slide
-![system architecture CFG and comparison to similar services](http://slides.com/spff/deck-1/fullscreen)
+[system architecture CFG and comparison to similar services](http://slides.com/spff/deck-1/fullscreen)
 
 #  schedule
 [done]discuss the features 3/9-
