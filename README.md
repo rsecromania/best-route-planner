@@ -2,22 +2,19 @@
 generate best(shortest) path or trip with given stops and conditions
 
 # Features
-basic
-* list related points from user input(address or keyword) for user to add
-* user can choose whether genarate a shortest path or shortest trip
-* plot the result(route) in google map and calculate the total length
-
-special
-* import stops from the points marked on customized google map(may require access to users google drive(the map is stored in there) or let user edit the map visible to who have the link)
+* high precision forward/reverse geocoder (using TGOS)
+* good keyword-to-address search
+* support multiple input file format
+* friendly UI
 
 optional
-* can choose vehicle
-* have choice to plot the result in other maps than google
+* import stops from the points marked on customized google map(may require access to users google drive(the map is stored in there) or let user edit the map visible to who have the link)
 * can import from platforms other than google
 
-
+#slide
+![system architecture CFG and comparison to similar services](http://slides.com/spff/deck-1/fullscreen)
 
 #  schedule
-discuss the features 3/9-
-estimate the implimentation approach
-build it
+[done]discuss the features 3/9-
+[90%]estimate the system architecture & detail
+[0%]build it
