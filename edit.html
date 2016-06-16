@@ -1,31 +1,61 @@
-<!DOCTYPE html>  
-<html>  
-<head>
-<style>
-.button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-</style>
-</head>
-  <body>  
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TGOS MAP API for Web 地址定位</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	    <script type="text/javascript" src="http://api.tgos.nat.gov.tw/TGOS_API/tgos?ver=2&AppID=ZXZ3QljtdjLwI6KN94tVpRHRGgFwz5rA977knQRc6KgCRkcNzCOE6A==&APIKey=cGEErDNy5yN/1fQ0vyTOZrghjE+jIU6uVea2zi2NjTZ0RWS16BWFnJ0XH6XcuvI6fZVpjJeGlgRgSpOkEDUIGt3A7sm10nHhMBUmIja8Mtezxbml/yEAY4j5W1sCP2dBoPqjI5vW3rFs67DPLl8BkcGgjHIl1U+8X7H08A9Px6wSKFxPybZy+czXIdZMiaoH8B7FPlOX700rBS/P8Cee7FB4EEidyiKkwOEjiemTs6g/t//ryWqJsgDxsSZ2gGrkFP5OlLs4Q/Kh5P+kMHOD30oZRl/O3tRLpRqjU9IZY5K2CxBj0EZDeqOd9b9FyJUZRcZ2vMdi4fcjizoOnzZtFRd8wWnVW25lRr+TXGHVRaohCWh1xQ9/Zg==" charset="utf-8"></script>
+		<script type="text/javascript">
+            var locator = new TGOS.TGLocateService();  //宣告定位物件
+            var addressInput;
 
-            <div id="contentframe" style="position:relative; top: 8px;left: 0px;float:right;">
-    <iframe width="1920" height="934" src="http://map.project-osrm.org/?z=13&center=22.624312%2C120.265325&loc=22.624311%2C120.265325&loc=22.656500%2C120.286170&loc=22.625103%2C120.325356&loc=22.679501%2C120.292259&loc=22.616633%2C120.341341&loc=22.624311%2C120.265325&hl=en&alt=0" name="osrmdemo">
-        </iframe></div>
+            function locate() {
+                locator.locateWGS84({  //指定回傳結果為TWD97坐標系統
+                    address: addressInput.value  //要求地址定位
+                }, function (e, status) {
+                    if (status != TGOS.TGLocatorStatus.OK) {
+                        return;
+                    }
+
+                    document.getElementById("addrXY").innerHTML = "X坐標：" + e[0].geometry.location.x + "，Y坐標：" + e[0].geometry.location.y;  //在addrXY Div中顯示地址坐標
+                });
+            }
+            function main() {
+
+                addressInput = document.getElementById('address');
+            };
+
+        </script>
 
 
-<a href="http://map.project-osrm.org/?z=13&center=22.624312%2C120.265325&loc=22.624311%2C120.265325&loc=22.656500%2C120.286170&loc=22.624311%2C120.265325&hl=en&alt=0" class="button"target="osrmdemo">Link Button </a>
 
-<button class="button">Button</button>
-<input type="button" class="button" value="Input Button">
-  </body>  
-</html>  
+
+
+        <style type="text/css">
+            .button {
+                background-color: #4CAF50;
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
+        </style>
+
+
+	</head>
+	<body onload="main()">
+
+        <iframe style="position: absolute; height: 100%; width:100%; z-index:-2; border: none" src="http://map.project-osrm.org/?z=13&center=22.624312%2C120.265325&loc=22.624311%2C120.265325&loc=22.656500%2C120.286170&loc=22.625103%2C120.325356&loc=22.679501%2C120.292259&loc=22.616633%2C120.341341&loc=22.624311%2C120.265325&hl=en&alt=0" name="osrmdemo"></iframe>
+
+		<div id="addrXY" style="width:640px;height:25px;border: 1px solid #C0C0C0;"></div>
+		輸入地址 :
+		<input style="width:40%" id='address' value='臺北市中山區松江路469巷4號'>
+		<input type="submit" value="地址定位" onclick="locate()">
+        <button class="button">bttn</button>
+
+	</body>
+</html>
