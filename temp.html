@@ -1,0 +1,36 @@
+﻿<div id="addrXY" style="width:640px;height:25px;border: 1px solid #C0C0C0;"></div>
+
+<script type="text/javascript">
+
+// Using XMLHttpRequest
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "https://crossorigin.me/https://www.pixnet.net/searcharticle?q=" + "%E5%B7%B4%E9%BB%8E%E6%B3%A2%E6%B3%A2"+"&type=related&period=year&page=1", true);
+xhr.onload = function () {
+    var re = /http%3A%2F%2F.*search-img/gi;
+    var re2 = /http[^ "]*/gi;
+    var found = xhr.responseText.match(re);
+    var found2 = found.join("\n").match(re2);
+
+    for (index = 0; index < found2.length; ++index) {
+        found2[index] = decodeURIComponent(found2[index]);
+    }
+    document.getElementById("addrXY").innerHTML = found2.join("\n");  //在addrXY Div中顯示
+
+    for (index = 0; index < found2.length; ++index) {
+        var xdxhr = new XMLHttpRequest();
+        xdxhr.open("GET", "https://crossorigin.me/" + found2[index], true);
+        xdxhr.onload = function () {
+            //過濾區塊 article-content-inner 到 <!-- .article-content //-->
+            //把吻合的地址存起來
+            //..[縣市][^ ]+(市區|鎮區|鎮市|[鄉鎮市區])[^\n]+號[0-9]+樓[-之][0-9]+
+
+        }
+        xdxhr.send();
+
+    }
+
+
+    console.log(found2);
+};
+xhr.send();
+</script>
