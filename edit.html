@@ -3,6 +3,9 @@
 	<head>
 		<title>TGOS MAP API for Web 地址定位</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+
+        <!--for TGOS-->
 	    <script type="text/javascript" src="http://api.tgos.nat.gov.tw/TGOS_API/tgos?ver=2&AppID=ZXZ3QljtdjLwI6KN94tVpRHRGgFwz5rA977knQRc6KgCRkcNzCOE6A==&APIKey=cGEErDNy5yN/1fQ0vyTOZrghjE+jIU6uVea2zi2NjTZ0RWS16BWFnJ0XH6XcuvI6fZVpjJeGlgRgSpOkEDUIGt3A7sm10nHhMBUmIja8Mtezxbml/yEAY4j5W1sCP2dBoPqjI5vW3rFs67DPLl8BkcGgjHIl1U+8X7H08A9Px6wSKFxPybZy+czXIdZMiaoH8B7FPlOX700rBS/P8Cee7FB4EEidyiKkwOEjiemTs6g/t//ryWqJsgDxsSZ2gGrkFP5OlLs4Q/Kh5P+kMHOD30oZRl/O3tRLpRqjU9IZY5K2CxBj0EZDeqOd9b9FyJUZRcZ2vMdi4fcjizoOnzZtFRd8wWnVW25lRr+TXGHVRaohCWh1xQ9/Zg==" charset="utf-8"></script>
 		<script type="text/javascript">
             var locator = new TGOS.TGLocateService();  //宣告定位物件
@@ -22,11 +25,46 @@
             function main() {
 
                 addressInput = document.getElementById('address');
+
+                var map, dir;
+
+                map = L.map('map', {
+                    layers: MQ.mapLayer(),
+                    center: [42.658694, -73.602323],
+                    zoom: 1
+                });
+
+                dir = MQ.routing.directions();
+
+                dir.optimizedRoute({
+                    locations: [
+                        '22.655522,120.283213',
+                        '22.638016,120.307674',
+                        '22.6665,120.29617',
+                        '22.660195,120.280895',
+                        '22.636907,120.275831'
+                    ]
+                });
+
+                map.addLayer(MQ.routing.routeLayer({
+                    directions: dir,
+                    fitBounds: true
+                }));
+
             };
+
+
+
 
         </script>
 
 
+        <!--for Mapquest-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.css" />
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.js"></script>
+        <script src="https://www.mapquestapi.com/sdk/leaflet/v2.s/mq-map.js?key=2CZdGauiaUA1KT1yjogmipADZGMNjJA6"></script>
+        <script src="https://www.mapquestapi.com/sdk/leaflet/v2.s/mq-routing.js?key=2CZdGauiaUA1KT1yjogmipADZGMNjJA6"></script>
 
 
 
@@ -43,13 +81,13 @@
                 margin: 4px 2px;
                 cursor: pointer;
             }
+
         </style>
 
 
 	</head>
 	<body onload="main()">
-
-        <iframe style="position: absolute; height: 100%; width:100%; z-index:-2; border: none" src="http://map.project-osrm.org/?z=13&center=22.624312%2C120.265325&loc=22.624311%2C120.265325&loc=22.656500%2C120.286170&loc=22.625103%2C120.325356&loc=22.679501%2C120.292259&loc=22.616633%2C120.341341&loc=22.624311%2C120.265325&hl=en&alt=0" name="osrmdemo"></iframe>
+        <div id="map" style="position: absolute; height: 100%; width:100%; z-index:-2; border: none"></div>
 
 		<div id="addrXY" style="width:640px;height:25px;border: 1px solid #C0C0C0;"></div>
 		輸入地址 :
