@@ -68,6 +68,55 @@
                     fitBounds: true
                 }));
             }
+            function readSingleFile(evt) {
+                //Retrieve the first (and only!) File from the FileList object
+                var f = evt.target.files[0];
+
+                if (f) {
+                    var r = new FileReader();
+                    r.onload = function (e) {
+                        var contents = e.target.result;
+                        alert(contents.substr(1, contents.indexOf("n"))
+                        );
+                    }
+                    r.readAsText(f);
+                } else {
+                    alert("Failed to load file");
+                }
+            }
+
+            function strongSearch() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "https://crossorigin.me/https://www.pixnet.net/searcharticle?q=" + encodeURIComponent(valueInput.value) + "&type=related&period=year&page=1", true);
+                xhr.onload = function () {
+                    var re = /http%3A%2F%2F.*search-img/gi;
+                    var re2 = /http[^ "]*/gi;
+                    var found = xhr.responseText.match(re);
+                    var found2 = found.join("\n").match(re2);
+
+                    for (index = 0; index < found2.length; ++index) {
+                        found2[index] = decodeURIComponent(found2[index]);
+                    }
+                    document.getElementById("addrXY").innerHTML = found2.join("\n");  //在addrXY Div中顯示
+
+                    for (index = 0; index < found2.length; ++index) {
+                        var xdxhr = new XMLHttpRequest();
+                        xdxhr.open("GET", "https://crossorigin.me/" + found2[index], true);
+                        xdxhr.onload = function () {
+                            //過濾區塊 article-content-inner 到 <!-- .article-content //-->
+                            //把吻合的地址存起來
+                            //..[縣市][^ ]+(市區|鎮區|鎮市|[鄉鎮市區])[^\n]+號[0-9]+樓[-之][0-9]+
+
+                        }
+                        xdxhr.send();
+
+                    }
+
+
+                    console.log(found2);
+                };
+                xhr.send();
+            }
 
             function main() {
 
@@ -79,6 +128,8 @@
                     center: [23.9756500, 120.97388194],
                     zoom: 8
                 });
+
+                document.getElementByName('upload').addEventListener('change', readSingleFile, false);
 
             };
 
@@ -116,6 +167,22 @@
                 word-wrap: break-word;
             }
 
+            div.upload {
+                width: 48px;
+                height: 48px;
+                background: url(http://i.imgur.com/hsibEwq.png);
+                overflow: hidden;
+            }
+
+            div.upload input {
+                display: block !important;
+                width: 157px !important;
+                height: 57px !important;
+                opacity: 0 !important;
+                overflow: hidden !important;
+            }
+
+
         </style>
 
 
@@ -129,6 +196,12 @@
             
             <button class="button" onclick="locate()">locate</button>
             <button class="button" onclick="go()">go</button>
+            <button class="button" onclick="strongSearch()">strong search</button>
+
+            <div class="upload" style="margin-left: 10px;">
+                <input type="file" name="upload" />
+            </div>
+
             <div class="test" id="box"></div>
         </div>
 	</body>
