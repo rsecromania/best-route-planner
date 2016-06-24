@@ -12,36 +12,47 @@
 
             var locator = new TGOS.TGLocateService();  //宣告定位物件
 
-            var valueInput;
 
             var coordinateArray = [];
 
             var map, dir;
 
 
-            function locate() {
-                valueInput = document.getElementById('inputField');
+            var valueInput, fileValueInput;
+            function locate(mode) {
+                if (mode == 1) {
+                    valueInput = document.getElementById('inputField').value;
+                } else {
+                    valueInput = fileValueInput;
 
+                }
                 var coordinatePattern = new RegExp(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)\s*,?\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/);
 
                 //TODO add proccess to this format N23°28' 14" E120°56'56"
-                if (coordinatePattern.test(valueInput.value)) {
-                    document.getElementById("addrXY").innerHTML = "coordinate found" + valueInput.value;  //在addrXY Div中顯示地址坐標
-                    coordinateArray.push(valueInput.value);
-                    
+                if (coordinatePattern.test(valueInput)) {
+                    document.getElementById("addrXY").innerHTML = "coordinate found " + valueInput;  //在addrXY Div中顯示地址坐標
+                    coordinateArray.push(valueInput);
+                    document.getElementById("box").innerHTML = coordinateArray.join("\n");  //在addrXY Div中顯示地址坐標
+
                 }
                 else {
 
                     locator.locateWGS84({  //指定回傳結果為WGS84坐標系統
-                        address: valueInput.value  //要求地址定位
+                        address: valueInput  //要求地址定位
                     }, function (e, status) {
                         if (status != TGOS.TGLocatorStatus.OK) {
+                            document.getElementById("addrXY").innerHTML = "查無資料，進階搜尋中...";
+                            strongSearch();
                             return;
                         }
 
-                        document.getElementById("addrXY").innerHTML = "X坐標：" + e[0].geometry.location.x + "，Y坐標：" + e[0].geometry.location.y;  //在addrXY Div中顯示地址坐標
+                        document.getElementById("addrXY").innerHTML = "address found " + e[0].geometry.location.y + ", " + e[0].geometry.location.x;  //在addrXY Div中顯示地址坐標
+                        coordinateArray.push(e[0].geometry.location.y + ", " + e[0].geometry.location.x);
+                        document.getElementById("box").innerHTML = coordinateArray.join("\n");  //在addrXY Div中顯示地址坐標
+
                     });
                 }
+
                 document.getElementById("box").innerHTML = coordinateArray.join("\n");  //在addrXY Div中顯示地址坐標
 
             }
@@ -75,8 +86,17 @@
                 if (f) {
                     var r = new FileReader();
                     r.onload = function (g) {
-                        var contents = g.target.result;
-                        document.getElementById("addrXY").innerHTML = contents; 
+                        var contents = g.target.result.replace(/(\r)/gm,"");
+                        var fileInputArray = contents.split("\n");
+
+                        document.getElementById("addrXY").innerHTML = fileInputArray.join("\n");  //在addrXY Div中顯示地址坐標
+                        
+                        for (index = 0; index < fileInputArray.length; ++index) {
+                            fileValueInput = fileInputArray[index];
+                            document.getElementById("addrXY").innerHTML = fileValueInput;  //在addrXY Div中顯示地址坐標
+
+                            locate(0);
+                        }
                     }
                     r.readAsText(f);
                 } else {
@@ -86,7 +106,7 @@
 
             function strongSearch() {
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", "https://crossorigin.me/https://www.pixnet.net/searcharticle?q=" + encodeURIComponent(valueInput.value) + "&type=related&period=year&page=1", true);
+                xhr.open("GET", "https://crossorigin.me/https://www.pixnet.net/searcharticle?q=" + encodeURIComponent(valueInput) + "&type=related&period=year&page=1", true);
                 xhr.onload = function () {
                     var re = /http%3A%2F%2F.*search-img/gi;
                     var re2 = /http[^ "]*/gi;
@@ -119,7 +139,7 @@
 
             function main() {
 
-                valueInput = document.getElementById('inputField');
+                valueInput = document.getElementById('inputField').value;
 
 
                 map = L.map('map', {
@@ -191,9 +211,8 @@
         <div id="leftdiv" style="width:480px;height:480px;border: 1px solid #C0C0C0;margin-left: 10px;margin-top: 40px;">
             <input style="width:360px;height:25px;" id='inputField' value='巴黎波波or臺北市中山區松江路469巷4號or22.655522, 120.283213'>
             
-            <button class="button" onclick="locate()">locate</button>
+            <button class="button" onclick="locate(1)">locate</button>
             <button class="button" onclick="go()">go</button>
-            <button class="button" onclick="strongSearch()">strong search</button>
 
             <div class="upload" style="margin-left: 10px;">
                 <input type="file" id="upload" />
