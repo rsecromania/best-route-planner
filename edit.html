@@ -4,52 +4,81 @@
 		<title>TGOS MAP API for Web 地址定位</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-
         <!--for TGOS-->
 	    <script type="text/javascript" src="http://api.tgos.nat.gov.tw/TGOS_API/tgos?ver=2&AppID=ZXZ3QljtdjLwI6KN94tVpRHRGgFwz5rA977knQRc6KgCRkcNzCOE6A==&APIKey=cGEErDNy5yN/1fQ0vyTOZrghjE+jIU6uVea2zi2NjTZ0RWS16BWFnJ0XH6XcuvI6fZVpjJeGlgRgSpOkEDUIGt3A7sm10nHhMBUmIja8Mtezxbml/yEAY4j5W1sCP2dBoPqjI5vW3rFs67DPLl8BkcGgjHIl1U+8X7H08A9Px6wSKFxPybZy+czXIdZMiaoH8B7FPlOX700rBS/P8Cee7FB4EEidyiKkwOEjiemTs6g/t//ryWqJsgDxsSZ2gGrkFP5OlLs4Q/Kh5P+kMHOD30oZRl/O3tRLpRqjU9IZY5K2CxBj0EZDeqOd9b9FyJUZRcZ2vMdi4fcjizoOnzZtFRd8wWnVW25lRr+TXGHVRaohCWh1xQ9/Zg==" charset="utf-8"></script>
 		<script type="text/javascript">
-            var locator = new TGOS.TGLocateService();  //宣告定位物件
-            var addressInput;
+
+
+
+            var locator /*= new TGOS.TGLocateService()*/;  //宣告定位物件
+
+            var valueInput;
+
+            var coordinateArray = [];
+
+            var map, dir;
+
 
             function locate() {
-                locator.locateWGS84({  //指定回傳結果為TWD97坐標系統
-                    address: addressInput.value  //要求地址定位
-                }, function (e, status) {
-                    if (status != TGOS.TGLocatorStatus.OK) {
-                        return;
-                    }
+                valueInput = document.getElementById('inputField');
 
-                    document.getElementById("addrXY").innerHTML = "X坐標：" + e[0].geometry.location.x + "，Y坐標：" + e[0].geometry.location.y;  //在addrXY Div中顯示地址坐標
-                });
+                var coordinatePattern = new RegExp(/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)\s*,?\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/);
+
+                //TODO add proccess to this format N23°28' 14" E120°56'56"
+                if (coordinatePattern.test(valueInput.value)) {
+                    document.getElementById("addrXY").innerHTML = "coordinate found" + valueInput.value;  //在addrXY Div中顯示地址坐標
+                    coordinateArray.push(valueInput.value);
+                    
+                }
+                else {
+
+                    locator.locateWGS84({  //指定回傳結果為WGS84坐標系統
+                        address: valueInput.value  //要求地址定位
+                    }, function (e, status) {
+                        if (status != TGOS.TGLocatorStatus.OK) {
+                            return;
+                        }
+
+                        document.getElementById("addrXY").innerHTML = "X坐標：" + e[0].geometry.location.x + "，Y坐標：" + e[0].geometry.location.y;  //在addrXY Div中顯示地址坐標
+                    });
+                }
+                document.getElementById("box").innerHTML = coordinateArray.join("\n");  //在addrXY Div中顯示地址坐標
+
             }
-            function main() {
+            function go() {
 
-                addressInput = document.getElementById('address');
-
-                var map, dir;
-
-                map = L.map('map', {
-                    layers: MQ.mapLayer(),
-                    center: [42.658694, -73.602323],
-                    zoom: 1
-                });
-
+                
                 dir = MQ.routing.directions();
 
                 dir.optimizedRoute({
-                    locations: [
-                        '22.655522,120.283213',
-                        '22.638016,120.307674',
-                        '22.6665,120.29617',
-                        '22.660195,120.280895',
-                        '22.636907,120.275831'
-                    ]
+                    locations: coordinateArray
                 });
+
+                /*
+                '22.655522, 120.283213',
+                '22.638016,120.307674',
+                '22.6665,120.29617',
+                '22.660195,120.280895',
+                '22.636907,120.275831'
+                */
+                
 
                 map.addLayer(MQ.routing.routeLayer({
                     directions: dir,
                     fitBounds: true
                 }));
+            }
+
+            function main() {
+
+                valueInput = document.getElementById('inputField');
+
+
+                map = L.map('map', {
+                    layers: MQ.mapLayer(),
+                    center: [23.9756500, 120.97388194],
+                    zoom: 8
+                });
 
             };
 
@@ -73,13 +102,18 @@
                 background-color: #4CAF50;
                 border: none;
                 color: white;
-                padding: 15px 32px;
+                padding: 5px 6px;
                 text-align: center;
                 text-decoration: none;
                 display: inline-block;
                 font-size: 16px;
-                margin: 4px 2px;
+                margin: 3px 2px;
                 cursor: pointer;
+            }
+            p.test {
+                width: 11em;
+                border: 1px solid #000000;
+                word-wrap: break-word;
             }
 
         </style>
@@ -89,11 +123,13 @@
 	<body onload="main()">
         <div id="map" style="position: absolute; height: 100%; width:100%; z-index:-2; border: none"></div>
 
-		<div id="addrXY" style="width:640px;height:25px;border: 1px solid #C0C0C0;"></div>
-		輸入地址 :
-		<input style="width:40%" id='address' value='臺北市中山區松江路469巷4號'>
-		<input type="submit" value="地址定位" onclick="locate()">
-        <button class="button">bttn</button>
-
+		<div id="addrXY" style="width:360px;height:25px;border: 1px solid #C0C0C0;"></div>
+        <div id="leftdiv" style="width:480px;height:480px;border: 1px solid #C0C0C0;margin-left: 10px;margin-top: 40px;">
+            <input style="width:360px;height:25px;" id='inputField' value='巴黎波波or臺北市中山區松江路469巷4號or22.655522, 120.283213'>
+            
+            <button class="button" onclick="locate()">locate</button>
+            <button class="button" onclick="go()">go</button>
+            <div class="test" id="box"></div>
+        </div>
 	</body>
 </html>
